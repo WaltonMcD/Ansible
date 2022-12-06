@@ -1,6 +1,7 @@
 --- # Bootstrap Webservers
 - hosts: Webservers
   become: yes
+  gather_facts: yes
 
   tasks:
   - name: latest httpd server
@@ -15,14 +16,14 @@
 
   - name: web content
     lineinfile:
-      line: "Hello World"
+      line: "Hello World From {{ ansible_hostname }}"
       path: /var/www/html/index.html
 
   - name: start apache httpd
     service:
       name: httpd
       state: started
-      
+
   - name: enable apache httpd
     service:
       name: httpd
