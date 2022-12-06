@@ -1,5 +1,5 @@
 --- # Bootstrap Webservers
-- hosts: Webservers
+- hosts: webservers
   become: yes
   gather_facts: yes
 
@@ -23,6 +23,10 @@
     service:
       name: httpd
       state: started
+    register: task_start_httpd
+
+  - debug:
+    msg: "{{ task_start_httpd }}"
 
   - name: enable apache httpd
     service:
