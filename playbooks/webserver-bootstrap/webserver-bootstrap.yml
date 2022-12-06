@@ -18,6 +18,8 @@
     lineinfile:
       line: "Hello World From {{ ansible_hostname }}"
       path: /var/www/html/index.html
+    notify:
+      - restart httpd
 
   - name: start apache httpd
     service:
@@ -26,9 +28,17 @@
     register: task_start_httpd
 
   - debug:
-    msg: "{{ task_start_httpd }}"
+    msg: "Output of starting httpd: {{ task_start_httpd }}"
 
   - name: enable apache httpd
     service:
       name: httpd
       state: enabled
+
+  # If contents of index.html are changed we will restart httpd
+  handlers:
+  - name: restart httpd
+    service:
+      name: httpd
+      state: restarted
+    listen: "restart httpd"
