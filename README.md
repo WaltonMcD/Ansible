@@ -62,6 +62,10 @@ Playbooks run using the `ansible-playbook` command. If you compare Ansible comma
 
 Play books are written in YAML, They contain different elements called plays, plays contain list of hosts and at minimum one task. Each task has a name and module.
 
+I recommend before running any playbook to first run it with the --check flag. This will create a dry run allowing you to see what Ansible would have changed, from this you can confirm the desired outcome.
+
+`ansible-playbook <YAML FILE> --check`
+
 To run a specific playbook this is the command you will use if using the default inventory file.
 
 `ansible-playbook <YAML FILE>`
@@ -69,3 +73,7 @@ To run a specific playbook this is the command you will use if using the default
 To run a playbook with a provided inventory file you will do so using the -i flag.
 
 `ansible-playbook -i <INVENTORY FILE> <YAML FILE>`
+
+If any of you plays fail to execute on a specific host, in example due to reachability then a playbook-name.retry file will be generated if RETRY_FILES_ENABLED is set to True. This file can be specified if re-running the playbook with the --limit flag to reattempt your plays on only the host which have failed.
+
+`ansible-playbook <YAML FILE> --limit <RETRY FILE>`
