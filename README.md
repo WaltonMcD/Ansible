@@ -10,7 +10,7 @@ This install is specific to Red Hat Enterprise Linux
 
 First you will need to install the epel-release repos.
 
-`$ sudo dnf config-manager --enable codeready-builder-for-rhel-9-rhui-rpms`
+`$ sudo dnf config-manager --enable codeready-builder-for-rhel-<VERSION>-rhui-rpms`
 
 `$ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-<VERSION>.noarch.rpm`
 
