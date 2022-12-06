@@ -50,4 +50,22 @@ This section will cover some basic commands to be comfortable with ansible and d
 - This command will ping the targeted host(s) and either return a success or failure based upon reachability.
 
 `ansible <HOST> -b -m yum -a "name=httpd state=latest"`
-- This command will use the yum module to install the apache httpd software on the targeted host(s). Forewarning Ansible will not assume root privileges unless specified to do so which is why I have applied the -b flag.
+- This command will use the yum module to install the apache httpd software on the targeted host(s). 
+- Forewarning Ansible will not assume root privileges unless specified to do so which is why I have applied the -b flag.
+
+`ansible <HOST> -b -m service -a "name=httpd state=started"`
+- This will change the state of httpd and should start the daemon on the specified host(s).
+- The service module is designed to operate with daemons in general.
+
+### Playbooks:
+Playbooks run using the `ansible-playbook` command. If you compare Ansible commands to bash commands playbooks are synonymous with bash scripts.
+
+Play books are written in YAML, They contain different elements called plays, plays contain list of hosts and at minimum one task. Each task has a name and module.
+
+To run a specific playbook this is the command you will use if using the default inventory file.
+
+`ansible-playbook <YAML FILE>`
+
+To run a playbook with a provided inventory file you will do so using the -i flag.
+
+`ansible-playbook -i <INVENTORY FILE> <YAML FILE>`

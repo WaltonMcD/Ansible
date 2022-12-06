@@ -1,0 +1,5 @@
+[nodes]
+master ansible_host=<Master Node Domain>
+node1 ansible_host=<Node 1 Domain>
+node2 ansible_host=<Node 2 Domain>
+nodeN ansible_host=<Node N Domain>
