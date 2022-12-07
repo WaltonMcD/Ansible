@@ -27,6 +27,7 @@
     ansible.builtin.service:
       name: httpd
       state: started
+      enabled: true
     register: task_start_httpd
 
   - name: Print httpd status
