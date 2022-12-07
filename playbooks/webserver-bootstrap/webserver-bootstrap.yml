@@ -8,7 +8,7 @@
   - name: Latest httpd server
     ansible.builtin.yum:
       name: httpd
-      state: 2.4.54
+      state: present
 
   - name: Create index.html file
     ansible.builtin.file:
@@ -21,7 +21,7 @@
       line: "Hello World From {{ ansible_hostname }}"
       path: /var/www/html/index.html
     notify:
-      - restart httpd
+      - Restart httpd
 
   - name: Start apache httpd
     ansible.builtin.service:
@@ -33,15 +33,9 @@
     ansible.builtin.debug:
       msg: "Output of starting httpd: {{ task_start_httpd }}"
 
-  - name: Enable apache httpd
-    ansible.builtin.service:
-      name: httpd
-      state: enabled
-
   # If contents of index.html are changed we will restart httpd
   handlers:
     - name: Restart httpd
       ansible.builtin.service:
         name: httpd
         state: restarted
-      listen: "restart httpd"
