@@ -15,7 +15,7 @@
       state: permissive
 
   - name: Install traffic control utility iproute-tc
-    ansible.builtin.yum:
+    ansible.builtin.dnf:
       name: iproute-tc
       state: present
 
@@ -47,8 +47,31 @@
         - net.ipv4.ip_forward                 = 1
         - net.bridge.bridge-nf-call-ip6tables = 1
 
-  - name: Curl kubernetes repo
-    ansible.builtin.get_url:
-      url: https://dl.k8s.io/release/v1.24.8/bin/linux/amd64/kubectl
-      dest: /etc/yum.repos.d/kubernetes.repo
-      mode: 0644
+  - name: Add cri-o repo
+    ansible.builtin.lineinfile:
+      path: /etc/dnfansible.builtin.dnf.repos.d/cri-o.repo
+      line: "{{ item }}"
+      loop:
+        - "[cri-o]"
+        - name=CRI-O
+        - baseurl=https://cbs.centos.org/repos/paas7-crio-311-candidate/x86_64/os/
+        - enabled=1
+        - gpgcheck=0
+
+  - name: Install cri-o
+    ansible.builtin.dnf:
+      name: cri-o
+      state: present
+
+  - name: Add kubernetes repo
+    ansible.builtin.lineinfile:
+      path: /etc/dnfansible.builtin.dnf.repos.d/kubernetes.repo
+      line: "{{ item }}"
+      loop:
+        - "[kubernetes]"
+        - name=Kubernetes
+        - baseurl=https://packages.cloud.google.com/dnfansible.builtin.dnf/repos/kubernetes-el7-x86_64
+        - enabled=1
+        - gpgcheck=1
+        - repo_gpgcheck=1
+        - gpgkey=https://packages.cloud.google.com/dnfansible.builtin.dnf/doc/rpm-package-key.gpg
