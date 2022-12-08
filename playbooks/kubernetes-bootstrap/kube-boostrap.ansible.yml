@@ -129,3 +129,12 @@
   - name: Deploy Calico network
     ansible.builtin.command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     when: ansible_hostname == 'master'
+
+  - name: Print join command for worker nodes
+    ansible.builtin.command: kubeadm token create --print-join-command
+    when: ansible_hostname == 'master'
+    register: join_command
+
+  - name: Connect worker nodes to cluster
+    ansible.builtin.command: "{{ join_command.stdout }}"
+    when: ansible_hostname != 'master'
