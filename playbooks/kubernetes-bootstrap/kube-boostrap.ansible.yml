@@ -59,37 +59,41 @@
     ansible.builtin.lineinfile:
       path: /etc/yum.repos.d/kubernetes.repo
       line: "{{ item }}"
+      create: true
+      mode: 0644
     loop:
       - "[kubernetes]"
       - name=Kubernetes
-      - baseurl=https://packages.cloud.google.com/dnfansible.builtin.dnf/repos/kubernetes-el7-x86_64
+      - baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
       - enabled=1
       - gpgcheck=1
       - repo_gpgcheck=1
-      - gpgkey=https://packages.cloud.google.com/dnfansible.builtin.dnf/doc/rpm-package-key.gpg
+      - gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
-  - name: Update and install containerd
+
+  - name: Update system
+    ansible.builtin.command: dnf update -y
+    changed_when: false
+
+  - name: Install containerd
     ansible.builtin.dnf:
-      name: "{{ item }}"
+      name: containerd.io
       state: present
-    loop:
-      - update
-      - containerd.io
 
-  - name: Start and Enable containerd
+  - name: Restart and Enable containerd
     ansible.builtin.systemd:
       name: containerd
-      state: started
       enabled: true
+      state: restarted
 
   - name: Install kubelet kubeadm kubectl
     ansible.builtin.dnf:
       name: "{{ item }}"
       state: present
     loop:
-      - kubelet
-      - kubeadm
-      - kubectl
+      - kubectl-1.24.8
+      - kubelet-1.24.8
+      - kubeadm-1.24.8
 
   - name: Start and Enable kubelet
     ansible.builtin.systemd:
@@ -97,16 +101,20 @@
       state: started
       enabled: true
 
+  - name: Print hostname
+    ansible.builtin.debug:
+      msg: "Output of hostname: {{ inventory_hostname }}"
+
   - name: Initialize Kubernetes cluster
     ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
-    when: ansible_hostname == 'master'
+    when: inventory_hostname == "master"
 
   - name: Create .kube directory
     ansible.builtin.file:
       path: $HOME/.kube
       state: directory
       mode: 0755
-    when: ansible_hostname == 'master'
+    when: inventory_hostname == "master"
 
   - name: Copy kubeconfig to .kube directory
     ansible.builtin.copy:
@@ -114,7 +122,7 @@
       dest: $HOME/.kube/config
       remote_src: true
       mode: 0755
-    when: ansible_hostname == 'master'
+    when: inventory_hostname == "master"
 
   - name: Chown .kube directory
     ansible.builtin.file:
@@ -123,17 +131,17 @@
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
       mode: 0755
-    when: ansible_hostname == 'master'
+    when: inventory_hostname == "master"
 
   - name: Deploy Calico network
     ansible.builtin.command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-    when: ansible_hostname == 'master'
+    when: inventory_hostname == "master"
 
   - name: Print join command for worker nodes
     ansible.builtin.command: kubeadm token create --print-join-command
-    when: ansible_hostname == 'master'
+    when: inventory_hostname == "master"
     register: join_command
 
   - name: Connect worker nodes to cluster
     ansible.builtin.command: "{{ join_command.stdout }}"
-    when: ansible_hostname != 'master'
+    when: inventory_hostname != "master"
