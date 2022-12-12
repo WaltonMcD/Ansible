@@ -117,6 +117,7 @@
   - name: Initialize Kubernetes cluster
     ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
     when: inventory_hostname == "master"
+    changed_when: false
 
   - name: Create .kube directory
     ansible.builtin.file:
@@ -133,15 +134,6 @@
       mode: 0644
     when: inventory_hostname == "master"
 
-  - name: Chown .kube directory
-    ansible.builtin.file:
-      path: $HOME/.kube
-      state: directory
-      owner: "{{ ansible_user }}"
-      group: "{{ ansible_user }}"
-      mode: 0644
-    when: inventory_hostname == "master"
-
   - name: Deploy Calico network
     ansible.builtin.command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     when: inventory_hostname == "master"
@@ -151,6 +143,11 @@
     when: inventory_hostname == "master"
     register: join_command
 
+  - name: Print join command
+    ansible.builtin.debug:
+      msg: "Output of join command: {{ join_command }}"
+    when: inventory_hostname == "master"
+
   - name: Connect worker nodes to cluster
-    ansible.builtin.command: "{{ join_command.stdout }}"
+    ansible.builtin.command: "{{ hostvars.master.join_command.stdout }}"
     when: inventory_hostname != "master"
