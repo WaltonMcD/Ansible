@@ -141,7 +141,7 @@
   - name: Wait for master to be Ready
     ansible.builtin.command: kubectl get nodes
     register: kubectl_get_nodes
-    until: "'master' in kubectl_get_nodes.stdout and 'Ready' in kubectl_get_nodes.stdout"
+    until: "'Ready' in kubectl_get_nodes.stdout"
     retries: 10
     delay: 10
     when: inventory_hostname == "master"
