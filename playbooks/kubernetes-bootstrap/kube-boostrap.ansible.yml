@@ -91,9 +91,9 @@
       name: "{{ item }}"
       state: present
     loop:
-      - kubectl-1.24.8
-      - kubelet-1.24.8
-      - kubeadm-1.24.8
+      - kubectl-1.24.9
+      - kubelet-1.24.9
+      - kubeadm-1.24.9
 
   - name: Start and Enable kubelet
     ansible.builtin.systemd:
