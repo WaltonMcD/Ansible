@@ -14,10 +14,9 @@
       policy: targeted
       state: permissive
 
-  - name: Install traffic control utility iproute-tc, yum-utils, device-mapper-persistent-data, lvm2
+  - name: Install traffic control utility yum-utils, device-mapper-persistent-data, lvm2
     ansible.builtin.dnf:
       name:
-        - iproute-tc
         - yum-utils
         - device-mapper-persistent-data
         - lvm2
