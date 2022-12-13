@@ -137,6 +137,7 @@
   - name: Deploy Calico network
     ansible.builtin.command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     when: inventory_hostname == "master"
+    changed_when: false
   
   - name: Wait for master to be Ready
     ansible.builtin.command: kubectl get nodes
@@ -145,11 +146,13 @@
     retries: 10
     delay: 10
     when: inventory_hostname == "master"
+    changed_when: false
 
   - name: Print join command for worker nodes
     ansible.builtin.command: kubeadm token create --print-join-command
     when: inventory_hostname == "master"
     register: join_command
+    changed_when: false
 
   - name: Print join command
     ansible.builtin.debug:
@@ -159,3 +162,14 @@
   - name: Connect worker nodes to cluster
     ansible.builtin.command: "{{ hostvars.master.join_command.stdout }}"
     when: inventory_hostname != "master"
+    changed_when: false
+
+  - name: Get helm install script helm on master
+    ansible.builtin.command: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+    when: inventory_hostname == "master"
+    changed_when: false
+
+  - name: Install helm on master
+    ansible.builtin.command: chmod 700 get_helm.sh && ./get_helm.sh
+    when: inventory_hostname == "master"
+    changed_when: false
